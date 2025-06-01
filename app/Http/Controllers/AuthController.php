@@ -57,7 +57,7 @@ class AuthController extends Controller
 
         // check if user has otp
         if($user->hasValidOtp()) {
-            return $this->returnError('An active OTP already exists. Please wait or request a new one after expiration.');
+            return $this->returnError(['otp' => ['An active OTP already exists. Please wait or request a new one after expiration.']]);
         }
 
         // generate ans send otp
@@ -82,11 +82,11 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if(!$user->hasValidOtp()) {
-            return $this->returnError('OTP expired or not generated.', 400);
+            return $this->returnError(['otp' => ['OTP expired or not generated.']], 400);
         }
 
         if ($request->otp !== $user->otp) {
-            return $this->returnError('Invalid OTP', 401);
+            return $this->returnError(['otp' => ['Invalid OTP']], 401);
         }
 
         // Mark email as verified
@@ -110,13 +110,13 @@ class AuthController extends Controller
         }
 
         if (!Auth::attempt($request->only('email', 'password'))) {
-            return $this->returnError('Invalid credentials.', 401);
+            return $this->returnError(['password' => ['Invalid credentials.']], 401);
         }
 
         $user = User::where('email', $request->email)->first();
 
         if (!$user->email_verified_at) {
-            return $this->returnError('Email not verified. Please verify your email first.', 403);
+            return $this->returnError(['email' => ['Email not verified. Please verify your email first.']], 403);
         }
 
         // Determine token expiration based on remember_me
@@ -157,7 +157,7 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if ($user->hasValidOtp()) {
-            return $this->returnError('An active OTP already exists. Please wait or request a new one after expiration.');
+            return $this->returnError(['otp' => ['An active OTP already exists. Please wait or request a new one after expiration.']], 400);
         }
 
         $otp = $user->generateOtp();
@@ -180,11 +180,11 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (!$user->hasValidOtp()) {
-            return $this->returnError('OTP expired or not generated.', 400);
+            return $this->returnError(['otp' => ['OTP expired or not generated.']], 400);
         }
 
         if ($user->otp != $request->otp) {
-            return $this->returnError('Invalid OTP.', 400);
+            return $this->returnError(['otp' => ['Invalid OTP.']], 400);
         }
 
         // Generate a temporary token for password reset
